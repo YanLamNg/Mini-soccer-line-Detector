@@ -103,10 +103,9 @@ def lsd(lines_s):
 
         merge_parallel_line(lines_s, MAX_LINE_WIDTH, 15)
 
-
         lines_s = __filter_by_length(lines_s, 50)
 
-        centerLine = classify_lines(lines_s)
+        classify_lines(lines_s)
 
     return lines_s
 
@@ -211,6 +210,7 @@ def __filter_by_length(lines, min_length):
 
 def lineSegmentDetect():
     global lines, LSD_img, lines_s
+    lines_s = []
     gray_lsd = cv.cvtColor(LSD_img, cv.COLOR_BGR2GRAY)
     LineSegmentDetector = cv.createLineSegmentDetector()
     lines = LineSegmentDetector.detect(gray_lsd)[0]
@@ -237,7 +237,6 @@ if __name__ == '__main__':
     cv.namedWindow("lines_img", cv.WINDOW_AUTOSIZE)
     cv.imshow('frame', frame)
     cv.imshow('lines_img', lines_img)
-    cv.waitKey(0)
     drawn_img = np.zeros((frame.shape[0], frame.shape[1], 3), np.uint8)
 
     ilowH = 62
@@ -273,7 +272,7 @@ if __name__ == '__main__':
     while(1):
         _, frame = cap.read()
         frame = cv.resize(frame, (480, 360))
-        cv.imshow('frame', frame)
+
 
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
@@ -317,7 +316,7 @@ if __name__ == '__main__':
                 cv.polylines(contourImg, [hull], True, (0,255,255), 2)
                 contourImg = cv.fillPoly(contourImg, [hull],(255,255,255))
                 field = cv.bitwise_and(frame,contourImg)
-        cv.imshow('field', field)
+
         hul = cv.getTrackbarPos('lowH', 'lines_img')
         huh = cv.getTrackbarPos('highH', 'lines_img')
         sal = cv.getTrackbarPos('lowS', 'lines_img')
@@ -337,14 +336,13 @@ if __name__ == '__main__':
         white_img[:] = (255, 255, 255)
         lines_img = cv.bitwise_and(white_img, white_img, mask=lines_mask)
         LSD_img =lines_img
-        lineSegmentDetect()
 
+        lsd(lines_s)
+        cv.imshow('frame', mask)
+        # cv.imshow('field', field)
+        # cv.imshow('contourImg', contourImg)
 
-        lines_s = lsd(lines_s)
-
-        cv.imshow('contourImg', contourImg)
-
-        cv.imshow('mask', mask)
+        # cv.imshow('mask', mask)
 
         cv.imshow('lines_img',lines_img)
         if cv.waitKey(1) & 0xFF == ord('q'):
